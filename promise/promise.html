@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Promise</title>
+    <style>
+        .ball{
+            width:40px;
+            height:40px;
+            border-radius: 20px;
+
+        }
+        #ball1{
+            background: red;
+        }
+        #ball2{
+            background: yellow;
+        }
+        #ball3{
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="ball1" class="ball " style="margin-left: 0;"></div>
+    <div id="ball2" class="ball " style="margin-left: 0;"></div>
+    <div id="ball3" class="ball " style="margin-left: 0;"></div>
+    <script src="bluebird/js/browser/bluebird.js"></script>
+    <script>
+        var ball1=document.getElementById('ball1');
+        var ball2=document.getElementById('ball2');
+        var ball3=document.getElementById('ball3');
+        //1.普通方式实现球运动的动画:ball是ball1或ball2或ball3,distance是给定的最终距离,cb是回调函数
+//        function animate(ball, distance, cb){
+//            setTimeout(function(){
+//                var marginLeft=parseInt(ball.style.marginLeft,10);
+//                if(marginLeft===distance){
+//                    cb && cb();
+//                }else{
+//                    if(marginLeft<distance){
+//                        marginLeft++
+//                    }else{
+//                        marginLeft--
+//                    }
+//                    ball.style.marginLeft=marginLeft+'px';
+//                    animate(ball, distance, cb)
+//                }
+//            },13)
+//
+//        }
+
+//        animate(ball1,100,function(){
+//            animate(ball2,200,function(){
+//                animate(ball3,300, function () {
+//                    animate(ball3,150, function () {
+//                        animate(ball2,150, function () {
+//                            animate(ball1,150, function () {
+//
+//                            })
+//                        })
+//                    })
+//                })
+//            })
+//        })
+
+        //2.promise方式实现球运动的动画:ball是ball1或ball2或ball3,distance是给定的最终距离
+        var Promise=window.Promise;
+        function promiseAnimate(ball,distance){
+            return new Promise(function(resolve,reject){
+                function _animate(){
+                    setTimeout(function(){
+                        var marginLeft=parseInt(ball.style.marginLeft,10);
+                        if(marginLeft===distance){
+                            resolve();
+                        }else{
+                            if(marginLeft<distance){
+                                marginLeft++
+                            }else{
+                                marginLeft--
+                            }
+                            ball.style.marginLeft=marginLeft+'px';
+                            _animate();
+                        }
+                    },13)
+                }
+                _animate();
+            })
+        }
+        //线性代码组织方式
+        promiseAnimate(ball1,100)
+                .then(function(){
+                    return promiseAnimate(ball2,200)
+                })
+                .then(function(){
+                    return promiseAnimate(ball3,300)
+                })
+                .then(function(){
+                    return promiseAnimate(ball3,150)
+                })
+                .then(function(){
+                    return promiseAnimate(ball2,150)
+                })
+                .then(function(){
+                    return promiseAnimate(ball1,150)
+                })
+    </script>
+</body>
+</html>
